@@ -17,8 +17,8 @@ import android.util.Size
 import android.view.Surface
 import android.view.TextureView
 
-class CameraManagerWrapper(activity: Activity, textureView: TextureView) {
-    private val TAG = CameraManagerWrapper::class.simpleName
+class SingleCameraManager(activity: Activity, textureView: TextureView) {
+    private val TAG = SingleCameraManager::class.simpleName
     private var activity: Activity
     private var textureView: TextureView
     private val cameraManager: CameraManager

@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
     private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE)
     private lateinit var textureView: TextureView
     private var isRecording: Boolean = false
-    private lateinit var cameraManagerWrapper: CameraManagerWrapper
+    private lateinit var singleCameraManager: SingleCameraManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,21 +35,21 @@ class MainActivity : AppCompatActivity() {
         }
 
         textureView = findViewById(R.id.texture_view)
-        cameraManagerWrapper = CameraManagerWrapper(this, textureView)
+        singleCameraManager = SingleCameraManager(this, textureView)
 
         findViewById<Button>(R.id.takePhotoButton).apply {
             setOnClickListener {
-                cameraManagerWrapper.takePhoto(windowManager.defaultDisplay.rotation)
+                singleCameraManager.takePhoto(windowManager.defaultDisplay.rotation)
             }
         }
 
         findViewById<Button>(R.id.recordButton).apply {
             setOnClickListener {
                 if (isRecording) {
-                    cameraManagerWrapper.stopRecording()
+                    singleCameraManager.stopRecording()
                     this.text = "Record Video"
                 } else {
-                    cameraManagerWrapper.startRecording()
+                    singleCameraManager.startRecording()
                     this.text = "Stop"
                 }
                 isRecording = !isRecording
@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("MissingPermission")
     override fun onResume() {
         super.onResume()
-        cameraManagerWrapper.onResume()
+        singleCameraManager.onResume()
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
-                cameraManagerWrapper.onResume()
+                singleCameraManager.onResume()
             } else {
                 Toast.makeText(this, "Permissions not granted.", Toast.LENGTH_SHORT).show()
                 //finish()
