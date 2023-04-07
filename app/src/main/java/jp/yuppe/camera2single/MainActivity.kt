@@ -1,6 +1,5 @@
 package jp.yuppe.camera2single
 
-
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent

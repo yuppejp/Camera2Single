@@ -21,7 +21,7 @@ class SingleCameraManager(activity: Activity, textureView: TextureView) {
     private val TAG = SingleCameraManager::class.simpleName
     private var activity: Activity
     private var textureView: TextureView
-    private val cameraManager: CameraManager
+    private lateinit var cameraManager: CameraManager
     private lateinit var videoCapture: VideoCapture
     private lateinit var cameraId: String
     private lateinit var previewSize: Size
@@ -33,7 +33,6 @@ class SingleCameraManager(activity: Activity, textureView: TextureView) {
     init {
         this.activity = activity
         this.textureView = textureView
-        this.cameraManager = activity.getSystemService(Context.CAMERA_SERVICE) as CameraManager
         startBackgroundThread()
     }
 
@@ -70,6 +69,7 @@ class SingleCameraManager(activity: Activity, textureView: TextureView) {
     }
 
     fun setupCamera() {
+        cameraManager = activity.getSystemService(Context.CAMERA_SERVICE) as CameraManager
         val cameraIds: Array<String> = cameraManager.cameraIdList
 
         for (id in cameraIds) {
@@ -96,12 +96,8 @@ class SingleCameraManager(activity: Activity, textureView: TextureView) {
     fun connectCamera() {
         cameraManager.openCamera(cameraId, object : CameraDevice.StateCallback() {
             override fun onOpened(camera: CameraDevice) {
-                videoCapture = VideoCapture(activity, camera)
-                val surfaceTexture: SurfaceTexture? = textureView.surfaceTexture
-                surfaceTexture?.setDefaultBufferSize(previewSize.width, previewSize.height)
-                val previewSurface: Surface = Surface(surfaceTexture)
-
-                videoCapture.startPreview(previewSurface, previewSize, backgroundHandler)
+                videoCapture = VideoCapture(activity, camera, textureView, previewSize, backgroundHandler)
+                videoCapture.startPreview()
             }
 
             override fun onDisconnected(cameraDevice: CameraDevice) {
@@ -136,7 +132,7 @@ class SingleCameraManager(activity: Activity, textureView: TextureView) {
     }
 
     fun startRecording() {
-        videoCapture.startRecording(textureView.surfaceTexture, previewSize, videoSize, backgroundHandler)
+        videoCapture.startRecording(videoSize)
     }
 
     fun stopRecording() {
